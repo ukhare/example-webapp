@@ -16,7 +16,7 @@
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build > npm_build.log 2>&1 || true" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build &gt; npm_build.log 2&gt;&amp;1 || true" />
     
     <!-- Annotate npm build warnings and errors -->
     <Exec Command="bash -c 'grep -i \"warning\" ../clientapp/npm_build.log | while read -r line; do echo \"::warning file=$(SpaRoot)npm_build.log::$line\"; done'" />
