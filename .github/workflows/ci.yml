@@ -49,7 +49,7 @@ jobs:
       id: npm-build
       run: |
         echo "Starting npm build..."
-        npm run build > npm-build.log 2>&1 || true
+        npm run build > npm_build.log 2>&1 || true
       working-directory: ./clientapp
       continue-on-error: true
 
