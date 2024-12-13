@@ -44,27 +44,46 @@ jobs:
       run: npm install
       working-directory: ./clientapp
 
-    - name: Run npm lint
-      run: |
-        cd clientapp
-        npm run lint > npm_lint.log 2>&1
+    - name: Run npm lint and capture logs
+          run: |
+            cd clientapp
+            npm run lint > npm_lint.log 2>&1
+            cat npm_lint.log  # This will print the logs in the job output
+            if grep -q "error" npm_lint.log; then exit 1; fi  # This ensures the job fails if there are errors
 
-    - name: Annotate npm lint warnings and errors
-      run: |
-        # Annotate warnings from npm lint
-        grep -i 'warning' clientapp/npm_lint.log | while read -r line; do
-          echo "::warning title=NPM Lint::$line"
-        done
+        - name: Annotate npm lint warnings and errors
+          run: |
+            # Annotate warnings from npm lint
+            grep -i 'warning' clientapp/npm_lint.log | while read -r line; do
+              echo "::warning title=NPM Lint::$line"
+            done
 
-        # Annotate errors from npm lint
-        grep -i 'error' clientapp/npm_lint.log | while read -r line; do
-          echo "::error title=NPM Lint::$line"
-        done
+            # Annotate errors from npm lint
+            grep -i 'error' clientapp/npm_lint.log | while read -r line; do
+              echo "::error title=NPM Lint::$line"
+            done
         
-    - name: Display npm lint logs
-      run: |
-        echo "==== NPM LINT LOG ===="
-        cat clientapp/npm_lint.log
+#    - name: Run npm lint
+#      run: |
+#        cd clientapp
+#        npm run lint > npm_lint.log 2>&1
+#
+#    - name: Annotate npm lint warnings and errors
+#      run: |
+#        # Annotate warnings from npm lint
+#        grep -i 'warning' clientapp/npm_lint.log | while read -r line; do
+#          echo "::warning title=NPM Lint::$line"
+#        done
+
+#        # Annotate errors from npm lint
+#        grep -i 'error' clientapp/npm_lint.log | while read -r line; do
+#          echo "::error title=NPM Lint::$line"
+#        done
+        
+#    - name: Display npm lint logs
+#      run: |
+#        echo "==== NPM LINT LOG ===="
+#        cat clientapp/npm_lint.log
         
     - name: Build npm package and capture logs
       id: npm-build
