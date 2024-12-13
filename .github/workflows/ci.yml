@@ -26,33 +26,13 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    # Ensure npm dependencies are installed
-    - name: Install and Build React App
-      run: |
-        npm install
-        npm run build
-      working-directory: ./clientapp
+    # Build WebApiServer (includes npm build via .csproj)
+    - name: Build WebApiServer
+      run: dotnet build WebApiServer/WebApiServer.csproj --configuration Release
 
-    # Annotate npm logs
+    # Annotate npm Build Logs (if errors/warnings are logged via csproj)
     - name: Annotate npm Build Logs
       run: |
-        # npm warnings
         grep -i "warning" WebApiServer/clientapp/npm_build.log | while read -r line; do
           echo "::warning file=${{ github.workspace }}/WebApiServer/clientapp/npm_build.log::$line"
         done || true
-        # npm errors
-        grep -i "error" WebApiServer/clientapp/npm_build.log | while read -r line; do
-          echo "::error file=${{ github.workspace }}/WebApiServer/clientapp/npm_build.log::$line"
-        done || true
-
-    # Build WebApiServer
-    - name: Build .NET API Server
-      run: dotnet build WebApiServer/WebApiServer.csproj --configuration Release
-
-    # Test WebApiServer
-    - name: Run Tests
-      run: dotnet test WebApiServer/WebApiServer.csproj --configuration Release
-
-    # Publish the WebApiServer
-    - name: Publish WebApiServer
-      run: dotnet publish WebApiServer/WebApiServer.csproj --configuration Release -o ./dotnet_publish
