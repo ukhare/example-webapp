@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<!--<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -36,4 +36,25 @@
     </ItemGroup>
   </Target>
 
-</Project>
+</Project> -->
+
+<Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+  <!-- Run npm install -->
+  <Exec WorkingDirectory="$(SpaRoot)" Command="npm install > npm_install.log 2>&1 || true" />
+
+  <!-- Run npm build and capture logs -->
+  <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build > npm_build.log 2>&1 || true" />
+
+  <!-- Annotate npm warnings and errors in the build logs -->
+  <Exec WorkingDirectory="$(SpaRoot)" Command="bash -c &quot;grep -i 'warning' npm_build.log | while read -r line; do echo '::warning title=NPM::$line'; done&quot;" />
+  <Exec WorkingDirectory="$(SpaRoot)" Command="bash -c &quot;grep -i 'error' npm_build.log | while read -r line; do echo '::error title=NPM::$line'; done&quot;" />
+
+  <!-- Include the built files -->
+  <ItemGroup>
+    <DistFiles Include="$(SpaRoot)dist\**" />
+    <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')">
+      <RelativePath>clientapp\%(DistFiles.RecursiveDir)%(DistFiles.Filename)%(DistFiles.Extension)</RelativePath>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </ResolvedFileToPublish>
+  </ItemGroup>
+</Target>
