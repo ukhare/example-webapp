@@ -29,7 +29,7 @@ jobs:
     - name: Build and Capture Logs for WebApiServer
       run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1 || true
 
-    - name: Annotate WebApiServer Build Logs
+    - name: WebApiServer Build Logs
       run: |
         # NPM build logs (if part of .csproj build process)
         grep -i "warning" WebApiServer/clientapp/npm_build.log | while read -r line; do
@@ -52,7 +52,7 @@ jobs:
     - name: Test the project and capture logs
       run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1 || true
 
-    - name: Annotate Test Logs
+    - name: Test Logs
       run: |
         # Test warnings
         grep "warning" test.log | while read -r line; do
@@ -67,7 +67,7 @@ jobs:
     - name: Publish the project and capture logs
       run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1 || true
 
-    - name: Annotate Publish Logs
+    - name: Publish Logs
       run: |
         # Publish warnings
         grep "warning" publish.log | while read -r line; do
