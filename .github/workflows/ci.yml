@@ -49,7 +49,7 @@ jobs:
 #      id: npm-build
 #      run: |
 #        echo "Starting npm build..."
-#        npm run build > npm_build.log 2>&1 || true
+#        npm run build > npm-build.log 2>&1 || true
 #      working-directory: ./clientapp
 #      continue-on-error: true
 
@@ -87,10 +87,10 @@ jobs:
     - name: Annotate npm Build Logs
       run: |
         # npm build warnings
-        grep -i "warning" clientapp/npm_build.log | while read -r line; do
-          echo "::warning file=${{ github.workspace }}/clientapp/npm_build.log::$line"
+        grep -i "warning" clientapp/npm-build.log | while read -r line; do
+          echo "::warning file=${{ github.workspace }}/clientapp/npm-build.log::$line"
         done || true
         # npm build errors
-        grep -i "error" clientapp/npm_build.log | while read -r line; do
-          echo "::error file=${{ github.workspace }}/clientapp/npm_build.log::$line"
+        grep -i "error" clientapp/npm-build.log | while read -r line; do
+          echo "::error file=${{ github.workspace }}/clientapp/npm-build.log::$line"
         done || true
