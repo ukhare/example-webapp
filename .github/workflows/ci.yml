@@ -17,87 +17,42 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Setup Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '16.x'
 
     - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
 
-#    - name: Install dependencies for React
-#      run: npm install
-#      working-directory: ./clientapp
+    # Ensure npm dependencies are installed
+    - name: Install and Build React App
+      run: |
+        npm install
+        npm run build
+      working-directory: ./clientapp
 
-#    - name: Build npm package and capture logs
-#      id: npm-build
-#      run: |
-#        echo "Starting npm build..."
-#        npm run build > npm_build.log 2>&1 || true
-#      working-directory: ./clientapp
-#      continue-on-error: true
-
+    # Annotate npm logs
     - name: Annotate npm Build Logs
       run: |
-        # npm build warnings
+        # npm warnings
         grep -i "warning" WebApiServer/clientapp/npm_build.log | while read -r line; do
-          echo "::warning file=${{ github.workspace }}/clientapp/npm_build.log::$line"
+          echo "::warning file=${{ github.workspace }}/WebApiServer/clientapp/npm_build.log::$line"
         done || true
-        # npm build errors
+        # npm errors
         grep -i "error" WebApiServer/clientapp/npm_build.log | while read -r line; do
-          echo "::error file=${{ github.workspace }}/clientapp/npm_build.log::$line"
+          echo "::error file=${{ github.workspace }}/WebApiServer/clientapp/npm_build.log::$line"
         done || true
 
-    - name: Build and Capture Logs for WebApiServer
-      run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1 || true
+    # Build WebApiServer
+    - name: Build .NET API Server
+      run: dotnet build WebApiServer/WebApiServer.csproj --configuration Release
 
-    - name: WebApiServer Build Logs
-      run: |
-        # NPM build logs (if part of .csproj build process)
-        grep -i "warning" WebApiServer/clientapp/npm_build.log | while read -r line; do
-          echo "::warning title=React Build::$line"
-        done || true
+    # Test WebApiServer
+    - name: Run Tests
+      run: dotnet test WebApiServer/WebApiServer.csproj --configuration Release
 
-        grep -i "error" WebApiServer/clientapp/npm_build.log | while read -r line; do
-          echo "::error title=React Build::$line"
-        done || true
-
-        # .NET build logs
-        grep "warning" webapi_build.log | while read -r line; do
-          echo "::warning title=.NET Lint::$line"
-        done || true
-
-        grep "error" webapi_build.log | while read -r line; do
-          echo "::error title=.NET Lint::$line"
-        done || true
-
-    - name: Test the project and capture logs
-      run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1 || true
-
-    - name: Test Logs
-      run: |
-        # Test warnings
-        grep "warning" test.log | while read -r line; do
-          echo "::warning title=.NET Test::$line"
-        done || true
-
-        # Test errors
-        grep "error" test.log | while read -r line; do
-          echo "::error title=.NET Test::$line"
-        done || true
-
-    - name: Publish the project and capture logs
-      run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1 || true
-
-    - name: Publish Logs
-      run: |
-        # Publish warnings
-        grep "warning" publish.log | while read -r line; do
-          echo "::warning title=.NET Publish::$line"
-        done || true
-
-        # Publish errors
-        grep "error" publish.log | while read -r line; do
-          echo "::error title=.NET Publish::$line"
-        done || true
+    # Publish the WebApiServer
+    - name: Publish WebApiServer
+      run: dotnet publish WebApiServer/WebApiServer.csproj --configuration Release -o ./dotnet_publish
