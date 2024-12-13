@@ -44,11 +44,11 @@ jobs:
       run: |
         # NPM build logs
         if [ -f WebApiServer/clientapp/npm_build.log ]; then
-          grep -i "warning" WebApiServer/clientapp/npm_build.log | while read -r line; do
+          grep -i "warning" ../clientapp/npm_build.log | while read -r line; do
             echo "::warning title=React Build::$line"
           done || true
 
-          grep -i "error" WebApiServer/clientapp/npm_build.log | while read -r line; do
+          grep -i "error" ../clientapp/npm_build.log | while read -r line; do
             echo "::error title=React Build::$line"
           done || true
         fi
