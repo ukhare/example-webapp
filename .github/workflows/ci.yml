@@ -41,17 +41,17 @@ jobs:
         done || true
 
   
-#    - name: Install dependencies for React
-#      run: npm install
-#      working-directory: ./clientapp
+    - name: Install dependencies for React
+      run: npm install
+      working-directory: ./clientapp
 
-#    - name: Build npm package and capture logs
-#      id: npm-build
-#      run: |
-#        echo "Starting npm build..."
-#        npm run build > npm-build.log 2>&1 || true
-#      working-directory: ./clientapp
-#      continue-on-error: true
+    - name: Build npm package and capture logs
+      id: npm-build
+      run: |
+        echo "Starting npm build..."
+        npm run build > npm-build.log 2>&1 || true
+      working-directory: ./clientapp
+      continue-on-error: true
 
     - name: Test the project and capture logs
       run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1 || true
@@ -79,10 +79,19 @@ jobs:
           echo "::error::$line"
         done || true
         
-    - name: Find npm_build.log
+    - name: Find webapi_build.log
       run: |
-        echo "Looking for npm_build.log..."
-        find . -name npm_build.log -exec echo "Found: {}" \;
+        echo "Looking for webapi_build.log..."
+        find . -name webapi_build.log -exec echo "Found: {}" \;
+
+    - name: Find and display webapi_build.log
+      run: |
+        echo "Looking for webapi_build.log..."
+        if find . -name webapi_build.log -exec echo "Found: {}" \; -exec cat {} \; ; then
+          echo "Log file displayed successfully."
+        else
+          echo "webapi_build.log not found."
+        fi
         
     - name: Annotate npm Build Logs
       run: |
