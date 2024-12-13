@@ -27,7 +27,7 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Build and Capture Logs for WebApiServer
-      run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1 || true
+      run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1
 
     - name: .NET Lint Log
       run: |
@@ -38,7 +38,7 @@ jobs:
 
         grep "error" ./webapi_build.log | while read -r line; do
           echo "::error title=.NET Lint::$line"
-        done || true
+        done
 
     - name: Install dependencies for React
       run: npm install
@@ -47,7 +47,7 @@ jobs:
     - name: Run npm lint
       run: |
         cd clientapp
-        npm run lint > npm_lint.log 2>&1 || true
+        npm run lint > npm_lint.log 2>&1
 
     - name: Annotate npm lint warnings and errors
       run: |
@@ -70,25 +70,24 @@ jobs:
       id: npm-build
       run: |
         echo "Starting npm build..."
-        npm run build > npm_build.log 2>&1 || true
+        npm run build > npm_build.log 2>&1
       working-directory: ./clientapp
-      continue-on-error: true
 
     - name: Test the project and capture logs
-      run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1 || true
+      run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
 
     - name: Annotate .NET Test log
       run: |
         grep "warning" test.log | while read -r line; do
           echo "::warning title=.NET Test::$line"
-        done || true
+        done
 
         grep "error" test.log | while read -r line; do
           echo "::error title=.NET Test::$line"
-        done || true
+        done
 
     - name: Publish the project and capture logs
-      run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1 || true
+      run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1
 
     - name: Annotate .NET Publish log
       run: |
@@ -98,7 +97,7 @@ jobs:
     
         grep "error" publish.log | while read -r line; do
           echo "::error::$line"
-        done || true
+        done
 
     - name: Annotate npm run log
       run: |
@@ -110,4 +109,4 @@ jobs:
         # npm build errors
         grep -i "error" clientapp/npm_build.log | while read -r line; do
           echo "::error file=${{ github.workspace }}/clientapp/npm_build.log::$line"
-        done || true
+        done
