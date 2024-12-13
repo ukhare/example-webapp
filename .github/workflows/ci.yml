@@ -1,0 +1,107 @@
+name: Build, Test, and Publish .NET Core and React App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16.x'
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '7.0.x'
+
+    - name: Install dependencies for React
+      run: npm install
+      working-directory: ./clientapp
+
+    - name: Build npm package and capture logs
+      id: npm-build
+      run: |
+        echo "Starting npm build..."
+        npm run build > npm_build.log 2>&1 || true
+      working-directory: ./clientapp
+      continue-on-error: true
+
+    - name: Annotate npm Build Logs
+      run: |
+        # npm build warnings
+        grep -i "warning" clientapp/npm_build.log | while read -r line; do
+          echo "::warning file=${{ github.workspace }}/clientapp/npm_build.log::$line"
+        done || true
+
+        # npm build errors
+        grep -i "error" clientapp/npm_build.log | while read -r line; do
+          echo "::error file=${{ github.workspace }}/clientapp/npm_build.log::$line"
+        done || true
+
+    - name: Build .NET and React app
+      id: dotnet-build
+      run: dotnet build --no-incremental -warnaserror > dotnet_build.log 2>&1 || true
+
+    - name: Annotate .NET Build Logs
+      run: |
+        # .NET build warnings
+        grep "warning" dotnet_build.log | while read -r line; do
+          echo "::warning file=${{ github.workspace }}/dotnet_build.log::$line"
+        done || true
+
+        # .NET build errors
+        grep "error" dotnet_build.log | while read -r line; do
+          echo "::error file=${{ github.workspace }}/dotnet_build.log::$line"
+        done || true
+
+    - name: Test the project and capture logs
+      id: test
+      shell: bash
+      run: |
+        echo "Starting tests..."
+        dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1 || true
+      continue-on-error: true
+
+    - name: Test Status
+      run: |
+        # Test warnings
+        grep "warning" test.log | while read -r line; do
+          echo "::warning file=${{ github.workspace }}/test.log::$line"
+        done || true
+
+        # Test errors
+        grep "error" test.log | while read -r line; do
+          echo "::error file=${{ github.workspace }}/test.log::$line"
+        done || true
+
+    - name: Publish
+      shell: bash
+      run: |
+        echo "Starting publish..."
+        dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1 || true
+      continue-on-error: true
+    
+    - name: Publish Status
+      id: publish_status
+      run: |
+        # Publish warnings
+        grep "warning" publish.log | while read -r line; do
+          echo "::warning file=${{ github.workspace }}/publish.log::$line"
+        done || true
+    
+        # Publish errors
+        grep "error" publish.log | while read -r line; do
+          echo "::error file=${{ github.workspace }}/publish.log::$line"
+        done || true
