@@ -21,8 +21,8 @@
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build &gt; npm_build.log 2&gt;&amp;1 || true" />
 
     <!-- Annotate npm build warnings and errors -->
-    <Exec Command="bash -c &quot;grep -i 'warning' ../clientapp/npm_build.log | while read -r line; do echo '::warning title=React Build::$line'; done&quot;" />
-    <Exec Command="bash -c &quot;grep -i 'error' ../clientapp/npm_build.log | while read -r line; do echo '::error title=React Build::$line'; done&quot;" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="bash -c &quot;grep -i 'warning' ../clientapp/npm_build.log | while read -r line; do echo '::warning title=React Build::$line'; done&quot;" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="bash -c &quot;grep -i 'error' ../clientapp/npm_build.log | while read -r line; do echo '::error title=React Build::$line'; done&quot;" />
 
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
