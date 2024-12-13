@@ -9,8 +9,8 @@
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build &gt; $(NpmLogFile) 2&gt;&amp;1 || true" />
 
     <!-- Annotate npm build warnings and errors -->
-    <Exec Command="bash -c &quot;grep -i 'warning' $(SpaRoot)$(NpmLogFile) | while read -r line; do echo '::warning file=$(SpaRoot)$(NpmLogFile)::$line'; done&quot;" />
-    <Exec Command="bash -c &quot;grep -i 'error' $(SpaRoot)$(NpmLogFile) | while read -r line; do echo '::error file=$(SpaRoot)$(NpmLogFile)::$line'; done&quot;" />
+    <Exec Command="bash -c &quot;grep -i 'warning' $(SpaRoot)$(NpmLogFile) | while read -r line; do echo '::warning title=React Build file=$(SpaRoot)$(NpmLogFile)::$line'; done&quot;" />
+    <Exec Command="bash -c &quot;grep -i 'error' $(SpaRoot)$(NpmLogFile) | while read -r line; do echo '::error title=React Build file=$(SpaRoot)$(NpmLogFile)::$line'; done&quot;" />
 
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
