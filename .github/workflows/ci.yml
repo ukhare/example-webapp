@@ -31,17 +31,22 @@ jobs:
 
     - name: Find webapi_build.log
       run: |
-       echo "Looking for webapi_build.log..."
+        echo "Looking for webapi_build.log..."
         find . -name webapi_build.log -exec echo "Found: {}" \;
+
+    - name: Read Content of webapi_build.log
+      run: |
+        echo "Content of webapi_build.log:"
+        cat ./webapi_build.log
 
     - name: Annotate WebApiServer Build Logs
       run: |
         # .NET build logs
-        grep "warning" webapi_build.log | while read -r line; do
+        grep "warning" ./webapi_build.log | while read -r line; do
           echo "::warning title=.NET Lint::$line"
         done || true
 
-        grep "error" webapi_build.log | while read -r line; do
+        grep "error" ./webapi_build.log | while read -r line; do
           echo "::error title=.NET Lint::$line"
         done || true
         
