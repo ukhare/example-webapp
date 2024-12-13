@@ -41,17 +41,17 @@ jobs:
         done || true
 
   
-#    - name: Install dependencies for React
-#      run: npm install
-#      working-directory: ./clientapp
+    - name: Install dependencies for React
+      run: npm install
+      working-directory: ./clientapp
 
-#    - name: Build npm package and capture logs
-#      id: npm-build
-#      run: |
-#        echo "Starting npm build..."
-#        npm run build > npm-build.log 2>&1 || true
-#      working-directory: ./clientapp
-#      continue-on-error: true
+    - name: Build npm package and capture logs
+      id: npm-build
+      run: |
+        echo "Starting npm build..."
+        npm run build > npm-build.log 2>&1 || true
+      working-directory: ./clientapp
+      continue-on-error: true
 
     - name: Test the project and capture logs
       run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1 || true
