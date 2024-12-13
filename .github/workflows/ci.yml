@@ -72,10 +72,10 @@ jobs:
     - name: Annotate .NET Publish Logs
       run: |
         grep "warning" publish.log | while read -r line; do
-          echo "::warning::$line"
+          echo "::warning:.NET Publish Warning:$line"
         done || true
     
         grep "error" publish.log | while read -r line; do
-          echo "::error::$line"
+          echo "::error:.NET Publish Error:$line"
         done || true
 
