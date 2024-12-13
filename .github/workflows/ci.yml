@@ -29,10 +29,10 @@ jobs:
     - name: Build and Capture Logs for WebApiServer
       run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1 || true
 
-    - name: Find webapi_build.log
+    - name: Find npm_build.log
       run: |
-        echo "Looking for webapi_build.log..."
-        find . -name webapi_build.log -exec echo "Found: {}" \;
+        echo "Looking for npm_build.log..."
+        find . -name npm_build.log -exec echo "Found: {}" \;
 
     - name: Read Content of webapi_build.log
       run: |
