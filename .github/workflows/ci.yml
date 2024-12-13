@@ -96,10 +96,10 @@ jobs:
     - name: Annotate npm Build Logs
       run: |
         # npm build warnings
-        grep -i "warning" clientapp/npm-build.log | while read -r line; do
+        grep -i "warning" clientapp/npm_build.log | while read -r line; do
           echo "::warning file=${{ github.workspace }}/clientapp/npm-build.log::$line"
         done || true
         # npm build errors
-        grep -i "error" clientapp/npm-build.log | while read -r line; do
-          echo "::error file=${{ github.workspace }}/clientapp/npm-build.log::$line"
+        grep -i "error" clientapp/npm_build.log | while read -r line; do
+          echo "::error file=${{ github.workspace }}/clientapp/npm_build.log::$line"
         done || true
