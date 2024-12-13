@@ -22,15 +22,15 @@
 
     <!-- Run npm build and capture logs -->
     <Exec Command="npm run build"
-          WorkingDirectory="$(SpaRoot)"
-          StandardOutputFile="$(SpaRoot)\npm-build.log"
-          StandardErrorFile="$(SpaRoot)\npm-build.log" />
+          WorkingDirectory="clientapp"
+          StandardOutputFile="clientapp\npm-build.log"
+          StandardErrorFile="clientapp\npm-build.log" />
 
     <!-- Annotate npm build warnings and errors -->
     <Exec WorkingDirectory="$(SpaRoot)" Command="bash -c &quot;grep -i 'warning' $(SpaRoot)\npm-build.log | while read -r line; do echo '::warning title=React Build::$line'; done&quot;" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="bash -c &quot;grep -i 'error' $(SpaRoot)\npm-build.log | while read -r line; do echo '::error title=React Build::$line'; done&quot;" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="bash -c &quot;cat $(SpaRoot)\npm-build.log&quot;" />
-
+    <Exec Command="npm run build" WorkingDirectory="clientapp" />
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
       <DistFiles Include="$(SpaRoot)dist\**" />
