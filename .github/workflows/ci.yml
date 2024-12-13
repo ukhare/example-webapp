@@ -29,7 +29,7 @@ jobs:
     - name: Build and Capture Logs for WebApiServer
       run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1 || true
 
-    - name: Annotate WebApiServer Build Logs
+    - name: .NET Lint Log
       run: |
         # .NET build logs
         grep "warning" ./webapi_build.log | while read -r line; do
@@ -56,7 +56,7 @@ jobs:
     - name: Test the project and capture logs
       run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1 || true
 
-    - name: Annotate Test Logs
+    - name: .NET Test log
       run: |
         grep "warning" test.log | while read -r line; do
           echo "::warning title=.NET Test::$line"
@@ -69,7 +69,7 @@ jobs:
     - name: Publish the project and capture logs
       run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1 || true
 
-    - name: Annotate .NET Publish Logs
+    - name: .NET Publish log
       run: |
         grep "warning" publish.log | while read -r line; do
           echo "::warning::$line"
@@ -78,22 +78,9 @@ jobs:
         grep "error" publish.log | while read -r line; do
           echo "::error::$line"
         done || true
-        
-    - name: Find webapi_build.log
-      run: |
-        echo "Looking for webapi_build.log..."
-        find . -name webapi_build.log -exec echo "Found: {}" \;
 
-    - name: Find and display webapi_build.log
-      run: |
-        echo "Looking for webapi_build.log..."
-        if find . -name webapi_build.log -exec echo "Found: {}" \; -exec cat {} \; ; then
-          echo "Log file displayed successfully."
-        else
-          echo "webapi_build.log not found."
-        fi
         
-    - name: Annotate npm Build Logs
+    - name: npm run log
       run: |
         # npm build warnings
         grep -i "warning" clientapp/npm_build.log | while read -r line; do
