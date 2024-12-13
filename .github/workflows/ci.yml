@@ -31,6 +31,17 @@ jobs:
 
     - name: Annotate WebApiServer Build Logs
       run: |
+        # .NET build logs
+        grep "warning" webapi_build.log | while read -r line; do
+          echo "::warning title=.NET Lint::$line"
+        done || true
+
+        grep "error" webapi_build.log | while read -r line; do
+          echo "::error title=.NET Lint::$line"
+        done || true
+        
+    - name: Annotate WebApiServer Build Logs
+      run: |
         # NPM build logs
         if [ -f WebApiServer/clientapp/npm_build.log ]; then
           grep -i "warning" WebApiServer/clientapp/npm_build.log | while read -r line; do
@@ -41,15 +52,6 @@ jobs:
             echo "::error title=React Build::$line"
           done || true
         fi
-
-        # .NET build logs
-        grep "warning" webapi_build.log | while read -r line; do
-          echo "::warning title=.NET Lint::$line"
-        done || true
-
-        grep "error" webapi_build.log | while read -r line; do
-          echo "::error title=.NET Lint::$line"
-        done || true
 
     - name: Test the project and capture logs
       run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1 || true
