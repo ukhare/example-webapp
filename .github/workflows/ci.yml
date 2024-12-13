@@ -26,17 +26,17 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-#    - name: Install dependencies for React
-#      run: npm install
-#      working-directory: ./clientapp
+    - name: Install dependencies for React
+      run: npm install
+      working-directory: ./clientapp
 
-#    - name: Build npm package and capture logs
-#      id: npm-build
-#      run: |
-#        echo "Starting npm build..."
-#        npm run build > npm_build.log 2>&1 || true
-#      working-directory: ./clientapp
-#      continue-on-error: true
+    - name: Build npm package and capture logs
+      id: npm-build
+      run: |
+        echo "Starting npm build..."
+        npm run build > npm_build.log 2>&1 || true
+      working-directory: ./clientapp
+      continue-on-error: true
 
     - name: Annotate npm Build Logs
       run: |
