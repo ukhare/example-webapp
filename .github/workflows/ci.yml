@@ -69,12 +69,13 @@ jobs:
     - name: Publish the project and capture logs
       run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1 || true
 
-    - name: Annotate Publish Logs
+    - name: Annotate .NET Publish Logs
       run: |
         grep "warning" publish.log | while read -r line; do
-          echo "::warning title=.NET Publish::$line"
+          echo ".NET Publish::warning::$line"
+        done || true
+    
+        grep "error" publish.log | while read -r line; do
+          echo ".NET Publish::error::$line"
         done || true
 
-        grep "error" publish.log | while read -r line; do
-          echo "::error title=.NET Publish::$line"
-        done || true
