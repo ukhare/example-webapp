@@ -1,0 +1,25 @@
+<Project>
+  <PropertyGroup>
+    <SpaRoot>..\clientapp\</SpaRoot>
+    <NpmLogFile>npm_build.log</NpmLogFile>
+  </PropertyGroup>
+
+  <Target Name="NpmInstallBuild" AfterTargets="ComputeFilesToPublish">
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build &gt; $(NpmLogFile) 2&gt;&amp;1 || true" />
+
+    <!-- Annotate npm build warnings and errors -->
+    <Exec Command="bash -c &quot;grep -i 'warning' $(SpaRoot)$(NpmLogFile) | while read -r line; do echo '::warning file=$(SpaRoot)$(NpmLogFile)::$line'; done&quot;" />
+    <Exec Command="bash -c &quot;grep -i 'error' $(SpaRoot)$(NpmLogFile) | while read -r line; do echo '::error file=$(SpaRoot)$(NpmLogFile)::$line'; done&quot;" />
+
+    <!-- Include the newly-built files in the publish output -->
+    <ItemGroup>
+      <DistFiles Include="$(SpaRoot)dist\**" />
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>clientapp\%(DistFiles.RecursiveDir)%(DistFiles.Filename)%(DistFiles.Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+</Project>
