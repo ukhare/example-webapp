@@ -122,7 +122,7 @@ jobs:
 
     - name: Generate Coverage Report
       run: |
-        dotnet reportgenerator -reports:WebApiServer/coverage/coverage.cobertura.xml -targetdir:WebApiServer/coverage-report -reporttypes:Html
+        dotnet coverage collect dotnet test -c Release --verbosity normal --filter "Category!=Performance" /home/runner/work/example-webapp/example-webapp/WebApiServer/bin/Release/net8.0/WebApiServer.dll --logger "trx;LogFileName=test-results.trx" --output WebApiServer/coverage/coverage.cobertura.xml --output-format cobertura
 
     - name: Annotate Cobertura Test Logs
       run: |
