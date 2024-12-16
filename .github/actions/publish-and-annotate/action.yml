@@ -32,3 +32,4 @@ runs:
         grep "error" "${{ inputs.app-dir }}/logs/publish.log" | while read -r line; do
           echo "::error title=.NET Publish::$line"
         done || true
+      continue-on-error: true
