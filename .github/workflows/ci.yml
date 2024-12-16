@@ -105,7 +105,6 @@ jobs:
 
     - name: Test the project and generate Cobertura report
       run: |
-        mkdir -p WebApiServer
         dotnet coverage collect dotnet test -c Release --verbosity normal --filter "Category!=Performance" WebApiServer/WebApiServer.csproj --logger "trx;LogFileName=test-results.trx" --output WebApiServer/coverage.cobertura.xml --output-format cobertura
 
     - name: Verify Cobertura Report Generation
