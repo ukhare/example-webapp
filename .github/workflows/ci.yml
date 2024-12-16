@@ -104,10 +104,12 @@ jobs:
     - name: Build the project
       run: dotnet build --no-restore -c Release WebApiServer/WebApiServer.csproj
 
+
     - name: Test and Generate Cobertura Report
       run: |
         mkdir -p WebApiServer/coverage
         dotnet test -c Release --verbosity normal --filter "Category!=Performance" WebApiServer/WebApiServer.csproj --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput=WebApiServer/coverage/ /p:CoverletOutputFormat=cobertura
+
 
     - name: Verify Cobertura Report Generation
       run: |
@@ -116,6 +118,7 @@ jobs:
         else
           echo "Cobertura report not found!" >&2
           exit 1
+        fi
 
     - name: Generate Coverage Report
       run: |
