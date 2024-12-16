@@ -28,6 +28,7 @@ jobs:
 
     - name: Install Required Tools for Code Coverage
       run: | 
+        dotnet tool install --global coverlet.console --version 3.0.3
         dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.1.11
 
     - name: Build and Capture Logs for WebApiServer
