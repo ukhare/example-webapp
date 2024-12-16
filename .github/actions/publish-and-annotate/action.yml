@@ -16,6 +16,7 @@ runs:
   using: composite
   steps:
     - name: Create Log Directory
+      shell: bash
       run: mkdir -p "${{ inputs.app-dir }}/logs"
 
     - name: Publish the project and capture logs
