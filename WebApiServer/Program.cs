@@ -1,5 +1,5 @@
 using Microsoft.Net.Http.Headers;
-using System.IO; // Unused namespace to generate a warning (remove this line to roll back)
+//using System.IO; // Unused namespace to generate a warning (remove this line to roll back)
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,16 +77,16 @@ if (app.Environment.IsProduction())
 app.Run();
 
 // Added deprecated method and call to introduce warnings
-[Obsolete("This method is deprecated, use NewMethod instead.")]
-public void OldMethod()
-{
+//[Obsolete("This method is deprecated, use NewMethod instead.")]
+//public void OldMethod()
+//{
     // Some code (Remove this method to roll back)
-}
+//}
 
-public void NewMethod()
-{
-    OldMethod(); // This will trigger a warning because OldMethod is marked as obsolete (Remove this call to roll back)
-}
+//public void NewMethod()
+//{
+//    OldMethod(); // This will trigger a warning because OldMethod is marked as obsolete (Remove this call to roll back)
+//}
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
