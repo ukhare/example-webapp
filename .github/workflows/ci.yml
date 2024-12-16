@@ -26,18 +26,25 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Build and Capture Logs for WebApiServer
-      run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1 || true
+    # Run Lint and Annotate Action 
+    - name: Run Lint and Annotate
+      uses: ./.github/actions/lint-and-annotate
+      with:
+        app-dir: 'WebApiServer'
+        app: 'WebApiServer'
+        
+#    - name: Build and Capture Logs for WebApiServer
+#      run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1 || true
 
-    - name: .NET Lint Log
-      run: |
-        # .NET build logs
-        grep "warning" ./webapi_build.log | while read -r line; do
-          echo "::warning title=.NET Lint::$line"
-        done
-        grep "error" ./webapi_build.log | while read -r line; do
-          echo "::error title=.NET Lint::$line"
-        done || true
+#    - name: .NET Lint Log
+#      run: |
+#        # .NET build logs
+#        grep "warning" ./webapi_build.log | while read -r line; do
+#          echo "::warning title=.NET Lint::$line"
+#        done
+#        grep "error" ./webapi_build.log | while read -r line; do
+#          echo "::error title=.NET Lint::$line"
+#        done || true
 
     - name: Install dependencies for React
       run: npm install
