@@ -97,56 +97,18 @@ jobs:
       working-directory: ./clientapp
       continue-on-error: true
 
-    #    - name: Test the project and capture logs
-    #      run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
-    #
-    #    - name: Annotate .NET Test log
-    #      run: |
-    #        grep "warning" test.log | while read -r line; do
-    #          echo "::warning title=.NET Test::$line"
-    #        done
-    #
-    #        grep "error" test.log | while read -r line; do
-    #          echo "::error title=.NET Test::$line"
-    #        done
-
-    - name: Enable .NET problem matcher
-      run: echo "::add-matcher::/home/runner/.dotnet/sdk/8.0.100/DotnetSdk.matchers.json"
-
-    - name: Run .NET Tests
-      run: dotnet test --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
-      continue-on-error: true
-
-    - name: Annotate Warnings and Errors
-      run: |
-        grep "warning" test.log | while read -r line; do
-          echo "::warning title=.NET Test::$line"
-        done
-
-        grep "error" test.log | while read -r line; do
-          echo "::error title=.NET Test::$line"
-        done
-      continue-on-error: true
-
-    - name: Enhanced Test Annotations
-      run: |
-        grep -i "Failed" test.log | while read -r line; do
-          # Extract file and line number if available
-          FILE=$(echo "$line" | grep -o "at .*\.cs" | awk '{print $2}')
-          LINE=$(echo "$line" | grep -o "line [0-9]*" | awk '{print $2}')
-          if [[ -n "$FILE" && -n "$LINE" ]]; then
-            echo "::error file=$FILE,line=$LINE::${line}"
-          else
-            echo "::error title=.NET Test::$line"
-          fi
-        done
-      continue-on-error: true
-
-    - name: Upload test log
-      uses: actions/upload-artifact@v3
-      with:
-         name: dotnet-test-log
-         path: test.log
+        - name: Test the project and capture logs
+          run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
+    
+        - name: Annotate .NET Test log
+          run: |
+            grep "warning" test.log | while read -r line; do
+              echo "::warning title=.NET Test::$line"
+            done
+    
+            grep "error" test.log | while read -r line; do
+              echo "::error title=.NET Test::$line"
+            done
 
     - name: Publish the project and capture logs
       run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1
