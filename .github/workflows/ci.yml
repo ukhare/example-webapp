@@ -90,17 +90,12 @@ jobs:
         test-dir: 'WebApiServer'
         test-library: 'WebApiServer'
 
-    - name: Publish the project and capture logs
-      run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1 || true
-
-    - name: Annotate .NET Publish log
-      run: |
-        grep "warning" publish.log | while read -r line; do
-          echo "::warning::$line"
-        done
-        grep "error" publish.log | while read -r line; do
-          echo "::error::$line"
-        done || true
+    - name: Run Publish and Annotate Action
+      uses: ./.github/actions/publish-and-annotate
+      with:
+        app-dir: 'WebApiServer'
+        app: 'WebApiServer'
+        version-container: '${{ github.sha }}'
 
     - name: Annotate npm run log
       run: |
@@ -110,5 +105,5 @@ jobs:
         done
         # npm build errors
         grep -i "error" clientapp/npm_build.log | while read -r line; do
-          echo "::error file=${{ github.workspace }}/clientapp/npm_build.log::$line"
+          echo "::error file=${{ github.workspace }}/clientapp/npm-build.log::$line"
         done || true
