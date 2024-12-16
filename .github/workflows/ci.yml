@@ -148,13 +148,13 @@ jobs:
 
     - name: Generate Coverage Report
       run: |
-        dotnet coverage collect dotnet test -c Release --verbosity normal --filter "Category!=Performance" /home/runner/work/example-webapp/example-webapp/WebApiServer/bin/Release/net8.0/WebApiServer.dll --logger "trx;LogFileName=test-results.trx" --output WebApiServer/coverage/coverage.cobertura.xml --output-format cobertura
+        dotnet coverage collect dotnet test -c Release --verbosity normal --filter "Category!=Performance" /home/runner/work/example-webapp/example-webapp/WebApiServer/bin/Release/net8.0/WebApiServer.dll --logger "trx;LogFileName=WebApiServer/test-results.trx" --output WebApiServer/coverage/coverage.cobertura.xml --output-format cobertura
 
     - name: Annotate Cobertura Test Logs
       run: |
-        if [ -f "WebApiServer/coverage/coverage.cobertura.xml" ]; then
-          warnings=$(grep -i "warning" WebApiServer/coverage/coverage.cobertura.xml)
-          errors=$(grep -i "error" WebApiServer/coverage/coverage.cobertura.xml)
+        if [ -f "WebApiServer/test-results.trx" ]; then
+          warnings=$(grep -i "warning" WebApiServer/test-results.trx)
+          errors=$(grep -i "error" WebApiServer/test-results.trx)
           if [ -n "$warnings" ]; then
             echo "$warnings" | while read -r line; do
               echo "::warning::Cobertura warning: $line"
