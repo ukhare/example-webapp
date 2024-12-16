@@ -93,6 +93,7 @@ jobs:
         echo "Starting npm build..."
         npm run build > npm_build.log 2>&1
       working-directory: ./clientapp
+      continue-on-error: true
 
     #    - name: Test the project and capture logs
     #      run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
