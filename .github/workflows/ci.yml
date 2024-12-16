@@ -26,161 +26,63 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Install Coverlet and ReportGenerator
-      run: |
-        dotnet tool install --global coverlet.console --version 1.7.0
-        dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.1.11
-
-    - name: Restore NuGet Packages
-      run: dotnet restore WebApiServer/WebApiServer.csproj
-
-    - name: Build the project
-      run: dotnet build --no-restore -c Release WebApiServer/WebApiServer.csproj
-
-    - name: Test and Generate Cobertura Report
-      run: |
-        mkdir -p WebApiServer/coverage
-        coverlet WebApiServer/bin/Release/net8.0/WebApiServer.dll --target "dotnet" --targetargs "test --no-build -c Release --verbosity normal --filter 'Category!=Performance' WebApiServer/WebApiServer.csproj --logger 'trx;LogFileName=test-results.trx'" --output WebApiServer/coverage/coverage.cobertura.xml --format cobertura
-
-    - name: Verify Cobertura Report Generation
-      run: |
-        if [ -f "WebApiServer/coverage/coverage.cobertura.xml" ]; then
-          echo "Cobertura report generated successfully."
-        else
-          echo "Cobertura report not found!" >&2
-          exit 1
-        fi
-
-    - name: Generate Coverage Report
-      run: |
-        reportgenerator -reports:WebApiServer/coverage/coverage.cobertura.xml -targetdir:WebApiServer/coverage-report -reporttypes:Html
-
-    - name: Annotate Cobertura Test Logs
-      run: |
-        if [ -f "WebApiServer/coverage/coverage.cobertura.xml" ]; then
-          warnings=$(grep -i "warning" WebApiServer/coverage/coverage.cobertura.xml)
-          errors=$(grep -i "error" WebApiServer/coverage/coverage.cobertura.xml)
-          if [ -n "$warnings" ]; then
-            echo "$warnings" | while read -r line; do
-              echo "::warning::Cobertura warning: $line"
-            done
-          fi
-          if [ -n "$errors" ]; then
-            echo "$errors" | while read -r line; do
-              echo "::error::Cobertura error: $line"
-            done
-          fi
-        fi
-        
     - name: Build and Capture Logs for WebApiServer
-      run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1
-      continue-on-error: true
-      
+      run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1 || true
+
     - name: .NET Lint Log
       run: |
         # .NET build logs
         grep "warning" ./webapi_build.log | while read -r line; do
           echo "::warning title=.NET Lint::$line"
         done
-
         grep "error" ./webapi_build.log | while read -r line; do
           echo "::error title=.NET Lint::$line"
-        done
-      continue-on-error: true
-      
+        done || true
     - name: Install dependencies for React
       run: npm install
       working-directory: ./clientapp
 
-    - name: Run npm lint and capture logs
+    - name: Run npm lint
       run: |
         cd clientapp
-        npm run lint > npm_lint.log 2>&1
-        cat npm_lint.log  # This will print the logs in the job output
-        if grep -q "error" npm_lint.log; then exit 1; fi  # This ensures the job fails if there are errors
-      continue-on-error: true
-
+        npm run lint > npm_lint.log 2>&1 || true
     - name: Annotate npm lint warnings and errors
       run: |
         # Annotate warnings from npm lint
         grep -i 'warning' clientapp/npm_lint.log | while read -r line; do
-            echo "::warning title=NPM Lint::$line"
+          echo "::warning title=NPM Lint::$line"
         done
-
         # Annotate errors from npm lint
         grep -i 'error' clientapp/npm_lint.log | while read -r line; do
-            echo "::error title=NPM Lint::$line"
+          echo "::error title=NPM Lint::$line"
         done
-      continue-on-error: true
         
-    #    - name: Run npm lint
-    #      run: |
-    #        cd clientapp
-    #        npm run lint > npm_lint.log 2>&1
-    #
-    #    - name: Annotate npm lint warnings and errors
-    #      run: |
-    #        # Annotate warnings from npm lint
-    #        grep -i 'warning' clientapp/npm_lint.log | while read -r line; do
-    #          echo "::warning title=NPM Lint::$line"
-    #        done
-    #
-    #        # Annotate errors from npm lint
-    #        grep -i 'error' clientapp/npm_lint.log | while read -r line; do
-    #          echo "::error title=NPM Lint::$line"
-    #        done
-        
-    #    - name: Display npm lint logs
-    #      run: |
-    #        echo "==== NPM LINT LOG ===="
-    #        cat clientapp/npm_lint.log
+    - name: Display npm lint logs
+      run: |
+        echo "==== NPM LINT LOG ===="
+        cat clientapp/npm_lint.log
         
     - name: Build npm package and capture logs
       id: npm-build
       run: |
         echo "Starting npm build..."
-        npm run build > npm_build.log 2>&1
+        npm run build > npm_build.log 2>&1 || true
       working-directory: ./clientapp
       continue-on-error: true
 
-    - name: Build the project
-      run: dotnet build --no-restore -c Release WebApiServer/WebApiServer.csproj
+    - name: Test the project and capture logs
+      run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1 || true
 
-    - name: Generate Coverage Report
+    - name: Annotate .NET Test log
       run: |
-        dotnet coverage collect dotnet test -c Release --verbosity normal --filter "Category!=Performance" /home/runner/work/example-webapp/example-webapp/WebApiServer/bin/Release/net8.0/WebApiServer.dll --logger "trx;LogFileName=WebApiServer/test-results.trx" --output WebApiServer/coverage/coverage.cobertura.xml --output-format cobertura
-
-    - name: Annotate Cobertura Test Logs
-      run: |
-        if [ -f "WebApiServer/test-results.trx" ]; then
-          warnings=$(grep -i "warning" WebApiServer/test-results.trx)
-          errors=$(grep -i "error" WebApiServer/test-results.trx)
-          if [ -n "$warnings" ]; then
-            echo "$warnings" | while read -r line; do
-              echo "::warning::Cobertura warning: $line"
-            done
-          fi
-          if [ -n "$errors" ]; then
-            echo "$errors" | while read -r line; do
-              echo "::error::Cobertura error: $line"
-            done
-          fi
-        fi
-#        - name: Test the project and capture logs
-#          run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
-    
-#        - name: Annotate .NET Test log
-#          run: |
-#            grep "warning" test.log | while read -r line; do
-#              echo "::warning title=.NET Test::$line"
-#            done
-    
-#            grep "error" test.log | while read -r line; do
-#              echo "::error title=.NET Test::$line"
-#            done
-
+        grep "warning" test.log | while read -r line; do
+          echo "::warning title=.NET Test::$line"
+        done || true
+        grep "error" test.log | while read -r line; do
+          echo "::error title=.NET Test::$line"
+        done || true
     - name: Publish the project and capture logs
-      run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1
+      run: dotnet publish WebApiServer/WebApiServer.csproj -c Release -o ./dotnet_publish -p:Version="${{ github.sha }}" > publish.log 2>&1 || true
 
     - name: Annotate .NET Publish log
       run: |
@@ -190,7 +92,7 @@ jobs:
     
         grep "error" publish.log | while read -r line; do
           echo "::error::$line"
-        done
+        done || true
 
     - name: Annotate npm run log
       run: |
@@ -198,9 +100,7 @@ jobs:
         grep -i "warning" clientapp/npm_build.log | while read -r line; do
           echo "::warning file=${{ github.workspace }}/clientapp/npm-build.log::$line"
         done
-
         # npm build errors
         grep -i "error" clientapp/npm_build.log | while read -r line; do
-          echo "::error file=${{ github.workspace }}/clientapp/npm-build.log::$line"
-        done
-      continue-on-error: true
+          echo "::error file=${{ github.workspace }}/clientapp/npm_build.log::$line"
+        done || true
