@@ -61,29 +61,29 @@ jobs:
         # Annotate errors from npm lint
         grep -i 'error' clientapp/npm_lint.log | while read -r line; do
             echo "::error title=NPM Lint::$line"
-        donee
+        done
         
-#    - name: Run npm lint
-#      run: |
-#        cd clientapp
-#        npm run lint > npm_lint.log 2>&1
-#
-#    - name: Annotate npm lint warnings and errors
-#      run: |
-#        # Annotate warnings from npm lint
-#        grep -i 'warning' clientapp/npm_lint.log | while read -r line; do
-#          echo "::warning title=NPM Lint::$line"
-#        done
-
-#        # Annotate errors from npm lint
-#        grep -i 'error' clientapp/npm_lint.log | while read -r line; do
-#          echo "::error title=NPM Lint::$line"
-#        done
+    #    - name: Run npm lint
+    #      run: |
+    #        cd clientapp
+    #        npm run lint > npm_lint.log 2>&1
+    #
+    #    - name: Annotate npm lint warnings and errors
+    #      run: |
+    #        # Annotate warnings from npm lint
+    #        grep -i 'warning' clientapp/npm_lint.log | while read -r line; do
+    #          echo "::warning title=NPM Lint::$line"
+    #        done
+    #
+    #        # Annotate errors from npm lint
+    #        grep -i 'error' clientapp/npm_lint.log | while read -r line; do
+    #          echo "::error title=NPM Lint::$line"
+    #        done
         
-#    - name: Display npm lint logs
-#      run: |
-#        echo "==== NPM LINT LOG ===="
-#        cat clientapp/npm_lint.log
+    #    - name: Display npm lint logs
+    #      run: |
+    #        echo "==== NPM LINT LOG ===="
+    #        cat clientapp/npm_lint.log
         
     - name: Build npm package and capture logs
       id: npm-build
@@ -92,55 +92,50 @@ jobs:
         npm run build > npm_build.log 2>&1
       working-directory: ./clientapp
 
-#    - name: Test the project and capture logs
-#      run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
+    #    - name: Test the project and capture logs
+    #      run: dotnet test -c Release --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
+    #
+    #    - name: Annotate .NET Test log
+    #      run: |
+    #        grep "warning" test.log | while read -r line; do
+    #          echo "::warning title=.NET Test::$line"
+    #        done
+    #
+    #        grep "error" test.log | while read -r line; do
+    #          echo "::error title=.NET Test::$line"
+    #        done
 
-#    - name: Annotate .NET Test log
-#      run: |
-#        grep "warning" test.log | while read -r line; do
-#          echo "::warning title=.NET Test::$line"
-#        done
 
-#        grep "error" test.log | while read -r line; do
-#          echo "::error title=.NET Test::$line"
-#        done
-
-
-      # Step 3: Enable .NET Problem Matcher
-     - name: Enable .NET problem matcher
+    - name: Enable .NET problem matcher
       run: echo "::add-matcher::$(dirname $(which dotnet))/../sdk/*/DotnetSdk.matchers.json"
 
-      # Step 4: Run Tests and Capture Logs
-     - name: Run .NET Tests
+    - name: Run .NET Tests
       run: dotnet test --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
 
-      # Step 5: Annotate with Simple Log Parsing (Your Approach)
-     - name: Annotate Warnings and Errors
+    - name: Annotate Warnings and Errors
       run: |
         grep "warning" test.log | while read -r line; do
           echo "::warning title=.NET Test::$line"
         done
 
-         grep "error" test.log | while read -r line; do
+        grep "error" test.log | while read -r line; do
           echo "::error title=.NET Test::$line"
         done
 
-    # Step 6: Enhanced Log Parsing with File and Line Metadata
     - name: Enhanced Test Annotations
       run: |
         grep -i "Failed" test.log | while read -r line; do
           # Extract file and line number if available
-           FILE=$(echo "$line" | grep -o "at .*\.cs" | awk '{print $2}')
-           LINE=$(echo "$line" | grep -o "line [0-9]*" | awk '{print $2}')
+          FILE=$(echo "$line" | grep -o "at .*\.cs" | awk '{print $2}')
+          LINE=$(echo "$line" | grep -o "line [0-9]*" | awk '{print $2}')
           if [[ -n "$FILE" && -n "$LINE" ]]; then
             echo "::error file=$FILE,line=$LINE::${line}"
-           else
-             echo "::error title=.NET Test::$line"
-           fi
+          else
+            echo "::error title=.NET Test::$line"
+          fi
         done
 
-   # Step 7: Upload Test Results (Optional)
-   - name: Upload test log
+    - name: Upload test log
       uses: actions/upload-artifact@v3
       with:
          name: dotnet-test-log
@@ -168,5 +163,5 @@ jobs:
 
         # npm build errors
         grep -i "error" clientapp/npm_build.log | while read -r line; do
-          echo "::error file=${{ github.workspace }}/clientapp/npm_build.log::$line"
+          echo "::error file=${{ github.workspace }}/clientapp/npm-build.log::$line"
         done
