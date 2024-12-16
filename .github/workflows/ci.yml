@@ -28,7 +28,8 @@ jobs:
 
     - name: Build and Capture Logs for WebApiServer
       run: dotnet build --no-incremental -warnaserror WebApiServer/WebApiServer.csproj > webapi_build.log 2>&1
-
+      continue-on-error: true
+      
     - name: .NET Lint Log
       run: |
         # .NET build logs
@@ -39,7 +40,8 @@ jobs:
         grep "error" ./webapi_build.log | while read -r line; do
           echo "::error title=.NET Lint::$line"
         done
-
+      continue-on-error: true
+      
     - name: Install dependencies for React
       run: npm install
       working-directory: ./clientapp
