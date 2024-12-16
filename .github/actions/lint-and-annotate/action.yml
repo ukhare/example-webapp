@@ -1,0 +1,27 @@
+name: "Lint and Annotate"
+description: "Build the project, capture logs, and annotate warnings and errors."
+
+inputs:
+  app-dir:
+    description: "Directory of the application project"
+    required: true
+  app:
+    description: "Name of the .NET application. Must match the name of the csproj file."
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Build the project and capture logs
+      shell: bash
+      run: dotnet build --no-incremental -warnaserror -property:WarningLevel=4 -property:TreatWarningsAsErrors=true "${{ inputs.app-dir }}/${{ inputs.app }}.csproj" 2>&1 | tee "${{ inputs.app-dir }}/build.log"
+
+    - name: Annotate .NET Build log
+      shell: bash
+      run: |
+        grep "warning" "${{ inputs.app-dir }}/build.log" | while read -r line; do
+          echo "::warning title=.NET Build::$line"
+        done || true
+        grep "error" "${{ inputs.app-dir }}/build.log" | while read -r line; do
+          echo "::error title=.NET Build::$line"
+        done || true
