@@ -31,6 +31,9 @@ jobs:
         dotnet tool install --global coverlet.console --version 1.7.0
         dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.1.11
 
+    - name: Restore NuGet Packages
+      run: dotnet restore WebApiServer/WebApiServer.csproj
+
     - name: Build the project
       run: dotnet build --no-restore -c Release WebApiServer/WebApiServer.csproj
 
