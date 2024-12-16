@@ -28,7 +28,6 @@ jobs:
 
     - name: Install Required Tools for Code Coverage
       run: | 
-        dotnet tool install --global coverlet.console --version 1.7.0
         dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.1.11
 
     - name: Build and Capture Logs for WebApiServer
@@ -105,7 +104,8 @@ jobs:
 
     - name: Test the project and generate Cobertura report
       run: |
-        dotnet coverage collect dotnet test -c Release --verbosity normal --filter "Category!=Performance" WebApiServer/WebApiServer.csproj --logger "trx;LogFileName=test-results.trx" --output WebApiServer/coverage.cobertura.xml --output-format cobertura
+        mkdir -p WebApiServer/coverage
+        dotnet test -c Release --verbosity normal --filter "Category!=Performance" WebApiServer/WebApiServer.csproj --logger "trx;LogFileName=test-results.trx" /p:CollectCoverage=true /p:CoverletOutput=WebApiServer/coverage/ /p:CoverletOutputFormat=cobertura
 
     - name: Verify Cobertura Report Generation
       run: |
