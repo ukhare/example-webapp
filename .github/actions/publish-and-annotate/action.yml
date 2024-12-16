@@ -15,16 +15,19 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Create Log Directory
+      run: mkdir -p "${{ inputs.app-dir }}/logs"
+
     - name: Publish the project and capture logs
       shell: bash
-      run: dotnet publish "${{ inputs.app-dir }}/${{ inputs.app }}.csproj" -c Release -o ./dotnet_publish -p:Version="${{ inputs.version-container }}" > publish.log 2>&1 || true
+      run: dotnet publish "${{ inputs.app-dir }}/${{ inputs.app }}.csproj" -c Release -o ./dotnet_publish -p:Version="${{ inputs.version-container }}" > "${{ inputs.app-dir }}/logs/publish.log" 2>&1 || true
 
     - name: Annotate .NET Publish log
       shell: bash
       run: |
-        grep "warning" publish.log | while read -r line; do
+        grep "warning" "${{ inputs.app-dir }}/logs/publish.log" | while read -r line; do
           echo "::warning title=.NET Publish::$line"
         done || true
-        grep "error" publish.log | while read -r line; do
+        grep "error" "${{ inputs.app-dir }}/logs/publish.log" | while read -r line; do
           echo "::error title=.NET Publish::$line"
         done || true
