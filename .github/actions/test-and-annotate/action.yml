@@ -25,3 +25,4 @@ runs:
         grep "error" "${{ inputs.test-dir }}/${{ inputs.test-library }}-test.log" | while read -r line; do
           echo "::error title=.NET Test::$line"
         done || true
+      continue-on-error: true
