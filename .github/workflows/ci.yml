@@ -108,9 +108,8 @@ jobs:
     #          echo "::error title=.NET Test::$line"
     #        done
 
-
     - name: Enable .NET problem matcher
-      run: echo "::add-matcher::$(dirname $(which dotnet))/../sdk/*/DotnetSdk.matchers.json"
+      run: echo "::add-matcher::/home/runner/.dotnet/sdk/8.0.100/DotnetSdk.matchers.json"
 
     - name: Run .NET Tests
       run: dotnet test --verbosity normal WebApiServer/WebApiServer.csproj > test.log 2>&1
